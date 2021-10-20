@@ -29,7 +29,7 @@ module.exports.getAddProducts = (req, res, next) => {
   res.status(200).render('admin/add-product', {
     title: 'Add Product',
     path: '/admin/add-product',
-    isAuthenticated: req.session.isLoggedIn
+    isAuthenticated: req.session.isLoggedIn,
   });
 };
 
@@ -84,7 +84,7 @@ module.exports.showEditPage = async (req, res, next) => {
         product,
         title: 'Edit product',
         path: 'admin/products',
-        isAuthenticated : req.session.isLoggedIn
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));

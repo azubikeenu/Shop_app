@@ -6,6 +6,7 @@ const userRoute = require('./routes/shop');
 const authRoute = require('./routes/auth');
 const { getPath } = require('./util/helpers');
 const { get404 } = require('./controllers/error');
+const csrf = require('csurf');
 
 const MONGODB_URI =
   'mongodb+srv://Richard:azubike88@cluster0.4eqaw.mongodb.net/node-complete?retryWrites=true&w=majority';
@@ -21,8 +22,9 @@ const store = MongoDBStore({
   uri: MONGODB_URI,
   collection: 'sessions',
 });
+const csrfProtection = csrf();
 
-const User = require('./data/user');
+
 const UserModel = require('./data/schema/user');
 //const expressHbs = require('express-handlebars')
 
@@ -46,6 +48,8 @@ app.use(
     store,
   })
 );
+
+app.use(csrfProtection);
 
 app.use((req, res, next) => {
   UserModel.findById('615f8907a783c7e2f2322886')

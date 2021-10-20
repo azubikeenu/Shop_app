@@ -23,13 +23,15 @@
                 </div>
                 <div class="card__actions">
                     <a class="btn" href="/products/<%=product._id%>">Details</a>
+                    <%if(isAuthenticated){%>
                     <%-include('../partials/add-to-cart.ejs' , {product}) %>
+                    <%}%>
                 </div>
             </article>
             <%}%>
-        </div>
-        <%} else{%>
-            <h1>No products found!</h1>
-            <%}%>
+                </div>
+                <%} else{%>
+                <h1>No products found!</h1>
+                <%}%>
     </main>
     <%-include('../partials/footer.ejs') %>

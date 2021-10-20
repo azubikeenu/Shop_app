@@ -2,6 +2,7 @@ const { requireTitle, requirePrice } = require('../util/validator');
 
 const router = require('express').Router();
 const handleErrors = require('../middlewares/handle_errors');
+const { isLoggedIn } = require('../middlewares/isloggedin');
 
 const {
   getAddProducts,
@@ -15,6 +16,8 @@ const {
   deleteProduct,
 } = require('../controllers/admin');
 
+router.use(isLoggedIn);
+
 router
   .route('/add-product')
   .get(getAddProducts)
@@ -25,6 +28,7 @@ router
     handleErrors('admin/add-product', {
       title: 'Add Product',
       path: '/admin/add-product',
+      isAuthenticated: true,
     }),
     postAddProduct
   );
@@ -42,6 +46,7 @@ router.route('/edit-product').post(
     {
       title: 'Edit Product',
       path: '/admin/edit-product',
+      isAuthenticated: true,
     },
     getProduct
   ),
