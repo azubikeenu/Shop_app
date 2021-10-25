@@ -21,7 +21,9 @@
             <div class="form-control">
                 <label for="passwordConfirmation">Confirm Password</label>
                 <input type="password" name="passwordConfirmation" id="passwordConfirmation">
-                <span class="error"> <%if(typeof getError !== 'undefined'){ %><%= getError(errors ,'passwordConfirmation')%><%}%>
+                <span class="error"> <%if(typeof getError !== 'undefined'){ %><%= getError(errors ,'passwordConfirmation')%><%}%></span>
+
+
             </div>
             <button class="btn" type="submit">Signup</button>
         </form>

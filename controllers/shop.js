@@ -6,12 +6,11 @@ const UserModel = require('../data/schema/user');
 module.exports.getProducts = (req, res, next) => {
   ProductModel.find()
     .then((products) => {
-      res.render('shop/product-list', {
+      return res.render('shop/product-list', {
         prods: products,
         title: 'All Products',
         path: '/products',
         cropText,
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
@@ -20,12 +19,11 @@ module.exports.getProducts = (req, res, next) => {
 module.exports.getIndexPage = (req, res, next) => {
   ProductModel.find()
     .then((products) => {
-      res.render('shop/index', {
+      return res.render('shop/index', {
         prods: products,
         title: 'Shop',
         path: '/',
         cropText,
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));

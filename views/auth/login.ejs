@@ -1,5 +1,4 @@
 <%-include('../partials/head.ejs') %>
-<link rel="stylesheet" href="/css/main.css">
 <link rel="stylesheet" href="/css/forms.css">
 <link rel="stylesheet" href="/css/auth.css">
 </head>
@@ -16,8 +15,10 @@
             <div class="form-control">
                 <label for="password">Password</label>
                 <input type="password" name="password" id="password">
-                <span class="error"> <%if(typeof getError !== 'undefined'){ %><%= getError(errors ,'password')%><%}%>
+                <span class="error"> <%if(typeof getError !== 'undefined'){ %><%= getError(errors ,'password')%><%}%></span>
+
             </div>
+
             <button class="btn" type="submit"> Login</button>
         </form>
     </main>

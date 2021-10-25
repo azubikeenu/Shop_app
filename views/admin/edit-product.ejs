@@ -20,6 +20,7 @@
             <div class="form-control">
                 <label for="image">image</label>
                 <input type="file" accept='image/*' name="photo" id="image">
+
                 <input type="hidden" value="<%=(typeof getError !== 'undefined') ? data.imageUrl : product.imageUrl%>"
                     name="imageUrl">
             </div>
