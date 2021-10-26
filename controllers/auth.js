@@ -1,5 +1,5 @@
 const UserModel = require('../data/schema/user');
-
+const Email = require('../util/email');
 module.exports.renderLogin = (req, res, next) => {
   res.render('auth/login', {
     title: 'Login',
@@ -31,7 +31,8 @@ module.exports.logout = (req, res, next) => {
 module.exports.signUp = async (req, res, next) => {
   const { email, password } = req.body;
   UserModel.create({ email, password, cart: { items: [] } })
-    .then(() => {
+    .then(async (user) => {
+      await new Email(user).sendWelcome();
       req.session.isLoggedIn = false;
       return res.redirect('/login');
     })
