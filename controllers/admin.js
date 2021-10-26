@@ -29,7 +29,6 @@ module.exports.getAddProducts = (req, res, next) => {
   res.status(200).render('admin/add-product', {
     title: 'Add Product',
     path: '/admin/add-product',
-    isAuthenticated: req.session.isLoggedIn,
   });
 };
 
@@ -66,7 +65,6 @@ module.exports.showProducts = async (req, res, next) => {
         prods: products,
         title: 'All Products',
         path: 'admin/products',
-        isAuthenticated: req.session.isLoggedIn,
         cropText,
       });
     })
@@ -84,7 +82,6 @@ module.exports.showEditPage = async (req, res, next) => {
         product,
         title: 'Edit product',
         path: 'admin/products',
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
@@ -92,6 +89,7 @@ module.exports.showEditPage = async (req, res, next) => {
 
 module.exports.editProduct = async (req, res, next) => {
   //if there is an image file
+  console.log("Hrer");
   if (req.file) req.body.imageUrl = req.file.filename;
   ProductModel.findByIdAndUpdate(req.query.id, req.body, {
     new: true,
@@ -102,7 +100,7 @@ module.exports.editProduct = async (req, res, next) => {
 };
 
 module.exports.getProduct = async (req, res, next) => {
-  const id = req.query.id;
+  const id = req.body.id;
   try {
     const product = await ProductModel.findById(id);
     return product;

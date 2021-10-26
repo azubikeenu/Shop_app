@@ -18,8 +18,8 @@
                 <span class="error"> <%if(typeof getError !== 'undefined'){ %><%= getError(errors ,'password')%><%}%></span>
 
             </div>
-
-            <button class="btn" type="submit"> Login</button>
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button class="btn" type="submit"> Login</button>
         </form>
     </main>
     <%-include('../partials/footer.ejs') %>

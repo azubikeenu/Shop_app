@@ -6,6 +6,11 @@ const userRoute = require('./routes/shop');
 const authRoute = require('./routes/auth');
 const { getPath } = require('./util/helpers');
 const { get404 } = require('./controllers/error');
+const csrf =  require('csurf');
+const flash = require('connect-flash');
+
+
+const User = require('./data/schema/user');
 
 
 const MONGODB_URI =
@@ -23,19 +28,24 @@ const store = MongoDBStore({
 });
 
 
-
-const UserModel = require('./data/schema/user');
 //const expressHbs = require('express-handlebars')
 
 const app = express();
 
 app.use(morgan('dev'));
 
+const csrfProtection = csrf()
+
 // use templating engine
 //app.engine('hbs' ,expressHbs({layoutsDir :join(rootDir ,'views', 'layouts'), defautLayout : 'main' , extname : 'hbs'}))
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
+
+
+app.use(express.static(join(getPath, 'public')));
+
+app.use(express.urlencoded({ extended: false, limit: '10kb' }));
 
 // USE session middleware
 app.use(
@@ -49,18 +59,15 @@ app.use(
   })
 );
 
+app.use(csrfProtection);
 
-app.use((req, res, next) => {
-  res.locals.isAuthenticated = req.session.isLoggedIn;
-  next();
-});
-
+app.use(flash())
 
 app.use((req, res, next) => {
   if (!req.session.user) {
     return next();
   }
-  UserModel.findById(req.session.user._id)
+  User.findById(req.session.user._id)
     .then(user => {
       req.user = user;
       next();
@@ -68,11 +75,12 @@ app.use((req, res, next) => {
     .catch(err => console.log(err));
 });
 
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
 
-
-app.use(express.static(join(getPath, 'public')));
-
-app.use(express.urlencoded({ extended: false, limit: '10kb' }));
 
 app.use(authRoute);
 

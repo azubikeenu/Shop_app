@@ -24,6 +24,7 @@ module.exports.getIndexPage = (req, res, next) => {
         title: 'Shop',
         path: '/',
         cropText,
+
       });
     })
     .catch((err) => console.log(err));
@@ -44,7 +45,6 @@ module.exports.showCart = async (req, res, next) => {
     title: 'Your Cart',
     path: '/cart',
     products,
-    isAuthenticated: req.session.isLoggedIn,
   });
 };
 
@@ -56,7 +56,6 @@ module.exports.getProduct = (req, res, next) => {
         title: `${product.title}`,
         path: '/products',
         product: product,
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
@@ -91,13 +90,14 @@ module.exports.postOrder = async (req, res, next) => {
     return { product: { ...product.toJSON() }, quantity };
   });
   const user = {
-    name: req.session.user.name,
+    email: req.user.email,
     userId: req.session.user._id,
   };
+  console.log(req.session.user);
   OrderModel.create({ products, user })
     .then(async () => {
       req.session.user.cart.items = [];
-      await req.session.user.save();
+      await req.user.save();
       res.redirect('/orders');
     })
     .catch((err) => console.log(err));
@@ -119,7 +119,6 @@ module.exports.getOrders = (req, res, next) => {
         title: 'Your Cart',
         path: '/orders',
         orders,
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));

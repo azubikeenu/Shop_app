@@ -32,7 +32,7 @@ module.exports.signUp = async (req, res, next) => {
   const { email, password } = req.body;
   UserModel.create({ email, password, cart: { items: [] } })
     .then(() => {
-      req.session.isLoggedIn = true;
+      req.session.isLoggedIn = false;
       return res.redirect('/login');
     })
     .catch((err) => console.log(err));

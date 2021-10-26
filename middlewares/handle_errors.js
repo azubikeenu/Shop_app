@@ -10,9 +10,7 @@ module.exports = (template, options, func) => {
       if (func) {
         data = await func(req);
       }
-
       renderedData = { errors, getError, data, ...options, ...renderedData };
-      //console.log(renderedData);
 
       return res.render(template, renderedData);
     }
