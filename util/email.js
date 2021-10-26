@@ -49,7 +49,7 @@ module.exports = class Email {
   async sendWelcome() {
     await this.send(
       'welcome',
-      'Welcome to Shop App we are glad to have you here '
+      'Signup Suceeded!!'
     );
   }
 };
