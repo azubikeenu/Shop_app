@@ -89,9 +89,9 @@ module.exports.showEditPage = async (req, res, next) => {
 
 module.exports.editProduct = async (req, res, next) => {
   //if there is an image file
-  console.log("Hrer");
+  const { id } = req.body;
   if (req.file) req.body.imageUrl = req.file.filename;
-  ProductModel.findByIdAndUpdate(req.query.id, req.body, {
+  ProductModel.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: false,
   })

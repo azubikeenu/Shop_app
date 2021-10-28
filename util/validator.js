@@ -54,6 +54,8 @@ module.exports = {
 
   requireValidUserPassword: check('password')
     .trim()
+    .isLength({ min: 4, max: 20 })
+    .withMessage(`Password is required`)
     .custom(async (password, { req }) => {
       const user = await UserModel.findOne({ email: req.body.email });
       if (!user) {

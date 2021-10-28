@@ -14,6 +14,8 @@ const {
   logout,
   renderSignUp,
   signUp,
+  renderResetPassword,
+  sendResetToken,
 } = require('../controllers/auth');
 
 const router = express.Router();
@@ -42,6 +44,19 @@ router
       isAuthenticated: false,
     }),
     signUp
+  );
+
+router
+  .route('/reset-password')
+  .get(renderResetPassword)
+  .post(
+    [requireValidEmail],
+    handleErrors('auth/forgot-password', {
+      title: 'Reset Password',
+      path: '/auth/forgot-password',
+      isAuthenticated: false,
+    }),
+    sendResetToken
   );
 
 module.exports = router;

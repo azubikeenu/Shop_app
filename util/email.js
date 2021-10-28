@@ -3,9 +3,10 @@ const { htmlToText } = require('html-to-text');
 const ejs = require('ejs');
 
 module.exports = class Email {
-  constructor(user) {
+  constructor(user, url = 'www.example.com') {
     this.to = user.email;
     this.from = `Shop Admin`;
+    this.url = url;
   }
 
   newTransport() {
@@ -24,8 +25,9 @@ module.exports = class Email {
     ejs.renderFile(
       `${__dirname}/../views/email/${template}.ejs`,
       {
-        email: this.email,
+        email: this.to,
         from: this.from,
+        url: this.url,
       },
       function (err, str) {
         if (err) {
@@ -47,9 +49,12 @@ module.exports = class Email {
   }
 
   async sendWelcome() {
+    await this.send('welcome', 'Signup Suceeded!!');
+  }
+  async sendPasswordReset() {
     await this.send(
-      'welcome',
-      'Signup Suceeded!!'
+      'password_reset',
+      'Your password reset token is valid for only 10 minutes'
     );
   }
 };

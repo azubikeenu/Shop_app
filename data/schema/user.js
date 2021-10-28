@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const User = new mongoose.Schema({
   password: {
@@ -10,6 +11,8 @@ const User = new mongoose.Schema({
     type: String,
     required: true,
   },
+  passwordResetToken: String,
+  passwordResetExpires: Date,
   cart: {
     items: [
       {
@@ -60,6 +63,16 @@ User.methods.comparePasswords = async function (
   userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+User.methods.createPasswordResetToken = function () {
+  const token = crypto.randomBytes(32).toString('hex');
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+  this.passwordResetExpires = Date.now() + 60 * 10 * 1000; // set the expiration time to 10 minutes
+  return token;
 };
 
 module.exports = mongoose.model('User', User);

@@ -46,3 +46,39 @@ module.exports.renderSignUp = (req, res, next) => {
     isAuthenticated: false,
   });
 };
+
+module.exports.renderResetPassword = (req, res, next) => {
+  let message = req.flash('success');
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = undefined;
+  }
+  res.status(200).render('auth/forgot-password', {
+    title: 'Forgot Password',
+    path: '/auth/forgot-password',
+    isAuthenticated: false,
+    successMessage: message,
+  });
+};
+
+module.exports.sendResetToken = async (req, res, next) => {
+  const user = await UserModel.findOne({ email: req.body.email });
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+  try {
+    const resetUrl = `${req.protocol}://${req.get(
+      'host'
+    )}/performPasswordReset/${resetToken}`;
+    req.flash('success', `Password reset token sent to ${req.body.email}`);
+    res.redirect('/reset-password');
+    return await new Email(user, resetUrl).sendPasswordReset();
+  } catch (err) {
+    // rollback if an error occurs
+    user.passwordRestToken = undefined;
+    user.passwordResetExpires = undefined;
+    req.flash('success', `There was a problem sending this email `);
+    res.redirect('/reset-password');
+    return await user.save({ validateBeforeSave: false });
+  }
+};
