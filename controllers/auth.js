@@ -1,4 +1,4 @@
-const UserModel = require('../data/schema/user');
+const User = require('../data/schema/user');
 const Email = require('../util/email');
 const crypto = require('crypto');
 const { getFlashMessage, setFlashMessage } = require('../util/helpers');
@@ -9,7 +9,6 @@ module.exports.renderLogin = (req, res, next) => {
   res.render('auth/login', {
     title: 'Login',
     path: '/login',
-    isAuthenticated: false,
     successMessage,
     errorMessage,
   });
@@ -18,17 +17,18 @@ module.exports.renderLogin = (req, res, next) => {
 module.exports.postLogin = (req, res, next) => {
   //res.setHeader('Set-Cookie', 'loggedIn=true ;HttpOnly')
   const { email } = req.body;
-  UserModel.findOne({ email }).then((user) => {
+  User.findOne({ email }).then((user) => {
     req.session.user = user;
     req.session.isLoggedIn = true;
     req.session.save((err) => {
-      console.log(err);
+      if (err) console.log(err);
       res.redirect('/');
     });
   });
 };
 
 module.exports.logout = (req, res, next) => {
+  req.session.isLoggedIn = false;
   req.session.destroy((err) => {
     console.log(err);
     res.redirect('/');
@@ -37,10 +37,9 @@ module.exports.logout = (req, res, next) => {
 
 module.exports.signUp = async (req, res, next) => {
   const { email, password } = req.body;
-  UserModel.create({ email, password, cart: { items: [] } })
+  User.create({ email, password, cart: { items: [] } })
     .then(async (user) => {
       res.redirect('/login');
-      req.session.isLoggedIn = false;
       return await new Email(user).sendWelcome();
     })
     .catch((err) => console.log(err));
@@ -50,7 +49,6 @@ module.exports.renderSignUp = (req, res, next) => {
   res.status(200).render('auth/signup', {
     title: 'Signup',
     path: '/auth/signup',
-    isAuthenticated: false,
   });
 };
 
@@ -60,14 +58,13 @@ module.exports.renderResetPassword = (req, res, next) => {
   res.status(200).render('auth/forgot-password', {
     title: 'Forgot Password',
     path: '/auth/forgot-password',
-    isAuthenticated: false,
     successMessage,
     errorMessage,
   });
 };
 
 module.exports.sendResetToken = async (req, res, next) => {
-  const user = await UserModel.findOne({ email: req.body.email });
+  const user = await User.findOne({ email: req.body.email });
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
   try {
@@ -80,15 +77,13 @@ module.exports.sendResetToken = async (req, res, next) => {
       'success',
       `Password reset token sent to ${req.body.email}`
     );
-    //req.flash('success', `Password reset token sent to ${req.body.email}`);
     res.redirect('/reset-password');
     return await new Email(user, resetUrl).sendPasswordReset();
   } catch (err) {
-    // rollback if an error occurs
+    // rollback changes if an error occurs
     user.passwordRestToken = undefined;
     user.passwordResetExpires = undefined;
     setFlashMessage(req, 'error', `There was a problem sending this email `);
-    // req.flash('success', `There was a problem sending this email `);
     res.redirect('/reset-password');
     return await user.save({ validateBeforeSave: false });
   }
@@ -96,11 +91,9 @@ module.exports.sendResetToken = async (req, res, next) => {
 
 module.exports.renderNewPassword = (req, res, next) => {
   const token = req.params.token;
-  console.log(req.params.token);
   res.status(200).render('auth/new-password', {
     title: 'New Password',
     path: '/auth/new-password',
-    isAuthenticated: false,
     token,
   });
 };
@@ -114,7 +107,7 @@ module.exports.updatePassword = async (req, res, next) => {
     .update(passwordResetToken)
     .digest('hex');
   //get the user based on the token
-  const user = await UserModel.findOne({
+  const user = await User.findOne({
     passwordResetToken: token,
     passwordResetExpires: { $gt: Date.now() }, // this only returns of the reset token is still valid
   });

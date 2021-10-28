@@ -1,10 +1,10 @@
 const { cropText } = require('../util/helpers');
-const ProductModel = require('../data/schema/product');
-const OrderModel = require('../data/schema/order');
-const UserModel = require('../data/schema/user');
+const Product = require('../data/schema/product');
+const Order = require('../data/schema/order');
+const User = require('../data/schema/user');
 
 module.exports.getProducts = (req, res, next) => {
-  ProductModel.find()
+  Product.find()
     .then((products) => {
       return res.render('shop/product-list', {
         prods: products,
@@ -17,7 +17,7 @@ module.exports.getProducts = (req, res, next) => {
 };
 
 module.exports.getIndexPage = (req, res, next) => {
-  ProductModel.find()
+  Product.find()
     .then((products) => {
       return res.render('shop/index', {
         prods: products,
@@ -32,7 +32,7 @@ module.exports.getIndexPage = (req, res, next) => {
 
 module.exports.showCart = async (req, res, next) => {
   const products = [];
-  const { cart } = await UserModel.findById(req.session.user).populate(
+  const { cart } = await User.findById(req.session.user).populate(
     'cart.items.product'
   );
   if (cart.items.length > 0) {
@@ -50,7 +50,7 @@ module.exports.showCart = async (req, res, next) => {
 
 module.exports.getProduct = (req, res, next) => {
   const { id } = req.params;
-  ProductModel.findById(id)
+  Product.findById(id)
     .then((product) => {
       res.status(200).render('shop/product-detail', {
         title: `${product.title}`,
@@ -83,7 +83,7 @@ module.exports.deleteCartItem = (req, res, next) => {
 };
 
 module.exports.postOrder = async (req, res, next) => {
-  const { cart } = await UserModel.findById(req.session.user).populate(
+  const { cart } = await User.findById(req.session.user).populate(
     'cart.items.product'
   );
   const products = cart.items.map(({ product, quantity }) => {
@@ -94,7 +94,7 @@ module.exports.postOrder = async (req, res, next) => {
     userId: req.session.user._id,
   };
   console.log(req.session.user);
-  OrderModel.create({ products, user })
+  Order.create({ products, user })
     .then(async () => {
       req.session.user.cart.items = [];
       await req.user.save();
@@ -104,7 +104,7 @@ module.exports.postOrder = async (req, res, next) => {
 };
 
 module.exports.getOrders = (req, res, next) => {
-  OrderModel.find({ 'user.userId': req.session.user._id })
+  Order.find({ 'user.userId': req.session.user._id })
     .then((orders) => {
       // const fn = orders.map((order) => {
       //   return {

@@ -4,26 +4,7 @@ const sharp = require('sharp');
 const { cropText } = require('../util/helpers');
 const multerStorage = multer.memoryStorage();
 
-const ProductModel = require('../data/schema/product');
-
-/*Using disk storage */
-// destination: (req, file, cb) => {
-//   cb(null, 'public/img');
-// },
-// filename: (req, file, cb) => {
-//   const ext = file.mimetype.split('/')[1];
-//   const randomId = crypto.randomBytes(4).toString('hex');
-//   req.filename = `${randomId}-${Date.now()}.${ext}`;
-//   cb(null, req.filename);
-// },
-
-// const multerFilter =(req,file,cb)=>{
-//   if(file.mimetype.startsWith('image')){
-//     cb(null, true)
-//   }else{
-//    return alert('can only upload images');
-//   }
-// }
+const Product = require('../data/schema/product');
 
 module.exports.getAddProducts = (req, res, next) => {
   res.status(200).render('admin/add-product', {
@@ -53,13 +34,13 @@ module.exports.uploadPhoto = upload.single('photo');
 module.exports.postAddProduct = (req, res, next) => {
   if (req.file) req.body.imageUrl = req.file.filename;
   req.body.userId = req.session.user;
-  ProductModel.create(req.body)
+  Product.create(req.body)
     .then(() => res.redirect('/admin/products'))
     .catch((err) => console.log(err));
 };
 
 module.exports.showProducts = async (req, res, next) => {
-  ProductModel.find()
+  Product.find()
     .then((products) => {
       return res.render('admin/products', {
         prods: products,
@@ -73,7 +54,7 @@ module.exports.showProducts = async (req, res, next) => {
 
 module.exports.showEditPage = async (req, res, next) => {
   const { id } = req.query;
-  ProductModel.findById(id)
+  Product.findById(id)
     .then((product) => {
       if (!product) {
         return res.redirect('/');
@@ -91,7 +72,7 @@ module.exports.editProduct = async (req, res, next) => {
   //if there is an image file
   const { id } = req.body;
   if (req.file) req.body.imageUrl = req.file.filename;
-  ProductModel.findByIdAndUpdate(id, req.body, {
+  Product.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: false,
   })
@@ -102,7 +83,7 @@ module.exports.editProduct = async (req, res, next) => {
 module.exports.getProduct = async (req, res, next) => {
   const id = req.body.id;
   try {
-    const product = await ProductModel.findById(id);
+    const product = await Product.findById(id);
     return product;
   } catch (err) {
     throw new Error(err.message);
@@ -111,7 +92,7 @@ module.exports.getProduct = async (req, res, next) => {
 
 module.exports.deleteProduct = async (req, res, next) => {
   const { id } = req.query;
-  ProductModel.findByIdAndDelete(id)
+  Product.findByIdAndDelete(id)
     .then(async () => {
       await req.user.deleteFromCart(id);
       return res.redirect('/admin/products');

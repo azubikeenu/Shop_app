@@ -30,7 +30,7 @@ router
     handleErrors('auth/login', {
       title: 'Login',
       path: '/auth/login',
-      isAuthenticated: false,
+      // isAuthenticated: false,
     }),
     postLogin
   );
@@ -43,7 +43,7 @@ router
     handleErrors('auth/signup', {
       title: 'Signup',
       path: '/auth/signup',
-      isAuthenticated: false,
+      // isAuthenticated: false,
     }),
     signUp
   );
@@ -56,7 +56,7 @@ router
     handleErrors('auth/forgot-password', {
       title: 'Reset Password',
       path: '/auth/forgot-password',
-      isAuthenticated: false,
+      // isAuthenticated: false,
     }),
     sendResetToken
   );
@@ -69,7 +69,6 @@ router.post(
   handleErrors('auth/new-password', {
     title: 'New Password',
     path: '/auth/new-password',
-    isAuthenticated: false,
   }),
   updatePassword
 );
