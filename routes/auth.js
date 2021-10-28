@@ -16,6 +16,8 @@ const {
   signUp,
   renderResetPassword,
   sendResetToken,
+  renderNewPassword,
+  updatePassword,
 } = require('../controllers/auth');
 
 const router = express.Router();
@@ -59,4 +61,16 @@ router
     sendResetToken
   );
 
+router.get('/new-password/:token', renderNewPassword);
+
+router.post(
+  '/new-password',
+  [requirePassword, requirePasswordConfirmation],
+  handleErrors('auth/new-password', {
+    title: 'New Password',
+    path: '/auth/new-password',
+    isAuthenticated: false,
+  }),
+  updatePassword
+);
 module.exports = router;

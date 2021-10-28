@@ -6,6 +6,12 @@
 <body>
     <%-include('../partials/navigation.ejs') %>
     <main>
+        <% if (typeof successMessage !== 'undefined') { %>
+        <div class="user-message user-message--success"><%= successMessage %></div>
+        <% } %>
+        <% if (typeof errorMessage !== 'undefined') { %>
+        <div class="user-message user-message--error"><%= errorMessage %></div>
+        <% } %>
         <form class="login-form" action='/login' method="POST">
             <div class="form-control">
                 <label for="email">Email</label>

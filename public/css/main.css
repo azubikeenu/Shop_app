@@ -245,6 +245,11 @@ form {
   background: rgb(26, 195, 155);
   color: #ffffff;
 }
+.user-message--error {
+  border-color: red;
+  background: rgb(255, 176, 176);
+  color: red;
+}
 
 @media (min-width: 768px) {
   .main-header__nav {

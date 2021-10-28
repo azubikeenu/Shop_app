@@ -23,4 +23,18 @@ module.exports = {
     return text;
   },
   getPath: path.dirname(process.mainModule.filename),
+
+  getFlashMessage(req, type) {
+    let message = req.flash(type);
+    if (message.length > 0) {
+      message = message[0];
+    } else {
+      message = undefined;
+    }
+    return message;
+  },
+
+  setFlashMessage(req, type, message) {
+    req.flash(type, message);
+  },
 };
