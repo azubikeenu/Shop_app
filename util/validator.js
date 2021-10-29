@@ -22,6 +22,7 @@ module.exports = {
       if (isExistingUser) {
         throw new Error('Email already in use!!');
       }
+      return true;
     }),
 
   requirePassword: check('password')
@@ -29,16 +30,14 @@ module.exports = {
     .isLength({ min: 4, max: 20 })
     .withMessage('Must be between 4 to 20 characters'),
 
-  requirePasswordConfirmation: check('passwordConfirmation')
-    .trim()
-    .isLength({ min: 4, max: 20 })
-    .withMessage('Must be between 4 and 20 characters')
-    .custom((passwordConfirmation, { req }) => {
+  requirePasswordConfirmation: check('passwordConfirmation').custom(
+    (passwordConfirmation, { req }) => {
       if (passwordConfirmation !== req.body.password) {
         throw new Error('Passwords must match');
       }
       return true;
-    }),
+    }
+  ),
 
   requireValidEmail: check('email')
     .trim()
@@ -52,21 +51,12 @@ module.exports = {
       }
     }),
 
-  requireValidUserPassword: check('password')
+  loginPassword: check('password').trim().notEmpty().withMessage('Password is required'),
+
+  loginEmail: check('email')
     .trim()
-    .isLength({ min: 4, max: 20 })
-    .withMessage(`Password is required`)
-    .custom(async (password, { req }) => {
-      const user = await UserModel.findOne({ email: req.body.email });
-      if (!user) {
-        throw new Error('Invalid Credentails !!');
-      }
-      const isValidPassword = await user.comparePasswords(
-        password,
-        user.password
-      );
-      if (!isValidPassword) {
-        throw new Error('Invalid Credentails !!');
-      }
-    }),
+    .normalizeEmail()
+    .isEmail()
+    .notEmpty()
+    .withMessage('Email is required'),
 };

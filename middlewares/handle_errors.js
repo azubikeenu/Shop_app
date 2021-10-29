@@ -5,8 +5,8 @@ module.exports = (template, options, func) => {
   return async (req, res, next) => {
     const errors = validationResult(req);
     let renderedData = {};
-    //this is used to pass token between requests when error occurs
-    const { token } = req.body;
+    //this is used to retain form data  between requests when error occurs
+    const oldInput = { ...req.body };
     if (!errors.isEmpty()) {
       let data = {};
       if (func) {
@@ -18,10 +18,10 @@ module.exports = (template, options, func) => {
         data,
         ...options,
         ...renderedData,
-        token,
+        oldInput,
       };
 
-      return res.render(template, renderedData);
+      return res.status(422).render(template, renderedData);
     }
 
     next();

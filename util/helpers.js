@@ -3,6 +3,7 @@ const path = require('path');
 module.exports = {
   getError: (errors, property) => {
     try {
+      //Returns: an object where the keys are the field names, and the values are the validation errors
       return errors.mapped()[property].msg;
     } catch (error) {
       return '';

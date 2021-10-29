@@ -17,12 +17,24 @@ module.exports.renderLogin = (req, res, next) => {
 module.exports.postLogin = (req, res, next) => {
   //res.setHeader('Set-Cookie', 'loggedIn=true ;HttpOnly')
   const { email } = req.body;
-  User.findOne({ email }).then((user) => {
+  User.findOne({ email }).then(async (user) => {
+    if (!user) {
+      setFlashMessage(req, 'error', 'Invalid username or password');
+      return res.redirect('/login');
+    }
+    const correctPassword = await user.comparePasswords(
+      req.body.password,
+      user.password
+    );
+    if (!correctPassword) {
+      setFlashMessage(req, 'error', 'Invalid username or password');
+      return res.redirect('/login');
+    }
     req.session.user = user;
     req.session.isLoggedIn = true;
     req.session.save((err) => {
       if (err) console.log(err);
-      res.redirect('/');
+      return res.redirect('/');
     });
   });
 };
@@ -90,11 +102,12 @@ module.exports.sendResetToken = async (req, res, next) => {
 };
 
 module.exports.renderNewPassword = (req, res, next) => {
-  const token = req.params.token;
+  const oldInput = {};
+  oldInput.token = req.params.token;
   res.status(200).render('auth/new-password', {
     title: 'New Password',
     path: '/auth/new-password',
-    token,
+    oldInput,
   });
 };
 

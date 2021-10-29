@@ -10,22 +10,22 @@
         <form class="signup-form" action="/signup" method="POST">
             <div class="form-control">
                 <label for="email">E-Mail</label>
-                <input type="email" name="email" id="email">
+                <input type="email" name="email" id="email" value="<%if(typeof oldInput !== 'undefined'){ %><%=oldInput.email.length>1? oldInput.email : ''%><%}%>">
                 <span class="error"> <%if(typeof getError !== 'undefined'){ %><%= getError(errors ,'email')%><%}%>
             </div>
             <div class="form-control">
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password">
+                <input type="password" name="password" id="password" value="<%if(typeof oldInput !== 'undefined'){ %><%=oldInput.password%><%}%>">
                 <span class="error"> <%if(typeof getError !== 'undefined'){ %><%= getError(errors ,'password')%><%}%>
             </div>
             <div class="form-control">
                 <label for="passwordConfirmation">Confirm Password</label>
-                <input type="password" name="passwordConfirmation" id="passwordConfirmation">
+                <input type="password" name="passwordConfirmation" id="passwordConfirmation" value="<%if(typeof oldInput !== 'undefined'){ %><%=oldInput.passwordConfirmation%><%}%>">
                 <span class="error"> <%if(typeof getError !== 'undefined'){ %><%= getError(errors ,'passwordConfirmation')%><%}%></span>
 
             </div>
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <button class="btn" type="submit">Signup</button>
+                <button class="btn" type="submit">Signup</button>
         </form>
     </main>
     <%-include('../partials/footer.ejs') %>

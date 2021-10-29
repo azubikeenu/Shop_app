@@ -4,7 +4,8 @@ const {
   requirePassword,
   requirePasswordConfirmation,
   requireValidEmail,
-  requireValidUserPassword,
+  loginEmail,
+  loginPassword
 } = require('../util/validator');
 const handleErrors = require('../middlewares/handle_errors');
 
@@ -26,7 +27,7 @@ router
   .route('/login')
   .get(renderLogin)
   .post(
-    [requireValidEmail, requireValidUserPassword],
+    [loginEmail, loginPassword],
     handleErrors('auth/login', {
       title: 'Login',
       path: '/auth/login',
