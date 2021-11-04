@@ -36,7 +36,12 @@ module.exports.postAddProduct = (req, res, next) => {
   req.body.userId = req.session.user;
   Product.create(req.body)
     .then(() => res.redirect('/admin/products'))
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log('herer');
+      const error = new Error(err);
+      error.statusCode = 500;
+      return next(error);
+    });
 };
 
 module.exports.showProducts = async (req, res, next) => {

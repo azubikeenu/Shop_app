@@ -1,5 +1,5 @@
 const router = require('express').Router();
-
+const {isLoggedIn} = require('../middlewares/isloggedin');
 const {
   getProducts,
   showCart,
@@ -18,9 +18,14 @@ router.get('/products', getProducts);
 
 router.get('/products/:id', getProduct);
 
+
+router.use(isLoggedIn);
+
 router.route('/cart').get(showCart).post(postCart);
 
 router.post('/cart-delete-item', deleteCartItem);
+
+
 
 router.get('/orders', getOrders);
 

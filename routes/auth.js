@@ -5,7 +5,7 @@ const {
   requirePasswordConfirmation,
   requireValidEmail,
   loginEmail,
-  loginPassword
+  loginPassword,
 } = require('../util/validator');
 const handleErrors = require('../middlewares/handle_errors');
 
@@ -31,7 +31,6 @@ router
     handleErrors('auth/login', {
       title: 'Login',
       path: '/auth/login',
-      // isAuthenticated: false,
     }),
     postLogin
   );
@@ -44,7 +43,6 @@ router
     handleErrors('auth/signup', {
       title: 'Signup',
       path: '/auth/signup',
-      // isAuthenticated: false,
     }),
     signUp
   );
@@ -57,7 +55,6 @@ router
     handleErrors('auth/forgot-password', {
       title: 'Reset Password',
       path: '/auth/forgot-password',
-      // isAuthenticated: false,
     }),
     sendResetToken
   );

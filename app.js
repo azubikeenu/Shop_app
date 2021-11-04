@@ -4,12 +4,11 @@ const { join } = require('path');
 const csrf = require('csurf');
 const flash = require('connect-flash');
 
-
 const adminRoute = require('./routes/admin');
 const userRoute = require('./routes/shop');
 const authRoute = require('./routes/auth');
 const { getPath } = require('./util/helpers');
-const { get404 } = require('./controllers/error');
+const { get404, get500 } = require('./controllers/error');
 const getCurrentUser = require('./middlewares/current_user');
 
 const MONGODB_URI =
@@ -68,6 +67,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/server_error', get500);
+
 app.use(authRoute);
 
 app.use('/admin', adminRoute);
@@ -75,6 +76,11 @@ app.use('/admin', adminRoute);
 app.use(userRoute);
 
 app.use(get404);
+
+app.use((error, req, res, next) => {
+  // res.status(error.httpStatusCode).render(...);
+  return res.redirect('/server_error');
+});
 
 mongoose
   .connect(MONGODB_URI, {
