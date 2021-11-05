@@ -13,7 +13,11 @@ module.exports.getProducts = (req, res, next) => {
         cropText,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.statusCode = 500;
+      return next(error);
+    });
 };
 
 module.exports.getIndexPage = (req, res, next) => {
@@ -24,28 +28,37 @@ module.exports.getIndexPage = (req, res, next) => {
         title: 'Shop',
         path: '/',
         cropText,
-
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.statusCode = 500;
+      return next(error);
+    });
 };
 
 module.exports.showCart = async (req, res, next) => {
   const products = [];
-  const { cart } = await User.findById(req.session.user).populate(
-    'cart.items.product'
-  );
-  if (cart.items.length > 0) {
-    for (const { product, quantity } of cart.items) {
-      product.quantity = quantity;
-      products.push(product);
+  try {
+    const { cart } = await User.findById(req.session.user).populate(
+      'cart.items.product'
+    );
+    if (cart.items.length > 0) {
+      for (const { product, quantity } of cart.items) {
+        product.quantity = quantity;
+        products.push(product);
+      }
     }
+    return res.status(200).render('shop/cart', {
+      title: 'Your Cart',
+      path: '/cart',
+      products,
+    });
+  } catch (err) {
+    const error = new Error(err);
+    error.statusCode = 500;
+    return next(error);
   }
-  return res.status(200).render('shop/cart', {
-    title: 'Your Cart',
-    path: '/cart',
-    products,
-  });
 };
 
 module.exports.getProduct = (req, res, next) => {
@@ -58,16 +71,23 @@ module.exports.getProduct = (req, res, next) => {
         product: product,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.statusCode = 500;
+      return next(error);
+    });
 };
 
 module.exports.postCart = (req, res, next) => {
-
   const { id } = req.body;
   req.user
     .addToCart(id)
     .then(res.redirect('cart/'))
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.statusCode = 500;
+      return next(error);
+    });
 };
 
 module.exports.deleteCartItem = (req, res, next) => {
@@ -79,7 +99,7 @@ module.exports.deleteCartItem = (req, res, next) => {
       console.log('Item deleted from cart');
       res.redirect('/cart');
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {});
 };
 
 module.exports.postOrder = async (req, res, next) => {
@@ -100,7 +120,11 @@ module.exports.postOrder = async (req, res, next) => {
       await req.user.save();
       res.redirect('/orders');
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.statusCode = 500;
+      return next(error);
+    });
 };
 
 module.exports.getOrders = (req, res, next) => {
@@ -121,5 +145,9 @@ module.exports.getOrders = (req, res, next) => {
         orders,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.statusCode = 500;
+      return next(error);
+    });
 };

@@ -33,7 +33,11 @@ module.exports.postLogin = (req, res, next) => {
     req.session.user = user;
     req.session.isLoggedIn = true;
     req.session.save((err) => {
-      if (err) console.log(err);
+      if (err) {
+        const error = new Error(err);
+        error.statusCode = 500;
+        return next(error);
+      }
       return res.redirect('/');
     });
   });
@@ -54,7 +58,11 @@ module.exports.signUp = async (req, res, next) => {
       res.redirect('/login');
       return await new Email(user).sendWelcome();
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.statusCode = 500;
+      return next(error);
+    });
 };
 
 module.exports.renderSignUp = (req, res, next) => {

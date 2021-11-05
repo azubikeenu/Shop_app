@@ -67,7 +67,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/server_error', get500);
 
 app.use(authRoute);
 
@@ -75,7 +74,13 @@ app.use('/admin', adminRoute);
 
 app.use(userRoute);
 
+app.get('/server_error', get500);
+
+// this should always appear last
 app.use(get404);
+
+
+
 
 app.use((error, req, res, next) => {
   // res.status(error.httpStatusCode).render(...);

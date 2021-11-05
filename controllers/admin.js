@@ -37,7 +37,6 @@ module.exports.postAddProduct = (req, res, next) => {
   Product.create(req.body)
     .then(() => res.redirect('/admin/products'))
     .catch((err) => {
-      console.log('herer');
       const error = new Error(err);
       error.statusCode = 500;
       return next(error);
@@ -54,7 +53,11 @@ module.exports.showProducts = async (req, res, next) => {
         cropText,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.statusCode = 500;
+      return next(error);
+    });
 };
 
 module.exports.showEditPage = async (req, res, next) => {
@@ -70,7 +73,11 @@ module.exports.showEditPage = async (req, res, next) => {
         path: 'admin/products',
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.statusCode = 500;
+      return next(error);
+    });
 };
 
 module.exports.editProduct = async (req, res, next) => {
@@ -82,7 +89,11 @@ module.exports.editProduct = async (req, res, next) => {
     runValidators: false,
   })
     .then(() => res.redirect('/admin/products'))
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.statusCode = 500;
+      return next(error);
+    });
 };
 
 module.exports.getProduct = async (req, res, next) => {
@@ -102,5 +113,9 @@ module.exports.deleteProduct = async (req, res, next) => {
       await req.user.deleteFromCart(id);
       return res.redirect('/admin/products');
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.statusCode = 500;
+      return next(error);
+    });
 };
