@@ -1,5 +1,7 @@
 const path = require('path');
-
+const { unlink } = require('fs');
+const { promisify } = require('util');
+const deleteFile = promisify(unlink);
 module.exports = {
   getError: (errors, property) => {
     try {
@@ -27,11 +29,15 @@ module.exports = {
 
   getFlashMessage(req, type) {
     let message = req.flash(type);
-    message =  message.length > 0 ? message[0] : undefined
-    return message ;
+    message = message.length > 0 ? message[0] : undefined;
+    return message;
   },
 
   setFlashMessage(req, type, message) {
     req.flash(type, message);
+  },
+
+  deleteFileFromPath(path) {
+    return deleteFile(path);
   },
 };

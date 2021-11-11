@@ -10,7 +10,6 @@ module.exports.generatePdf = (template, data, options, filePath) => {
     data,
     path: filePath,
   };
-
   return pdf.create(document, options);
 
 };

@@ -126,10 +126,11 @@ module.exports.updatePassword = async (req, res, next) => {
     .createHash('sha256')
     .update(passwordResetToken)
     .digest('hex');
+
   //get the user based on the token
   const user = await User.findOne({
     passwordResetToken: token,
-    passwordResetExpires: { $gt: Date.now() }, // this only returns of the reset token is still valid
+    passwordResetExpires: { $gt: Date.now() },
   });
   if (!user) {
     setFlashMessage(req, 'error', 'Invalid token or token expired');

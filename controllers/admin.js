@@ -1,11 +1,11 @@
 const multer = require('multer');
 const crypto = require('crypto');
 const sharp = require('sharp');
-const { cropText } = require('../util/helpers');
+const path = require('path');
+const { cropText, deleteFileFromPath } = require('../util/helpers');
 const multerStorage = multer.memoryStorage();
 
 const Product = require('../data/schema/product');
-
 
 const upload = multer({ storage: multerStorage });
 
@@ -84,11 +84,26 @@ module.exports.showEditPage = async (req, res, next) => {
 module.exports.editProduct = async (req, res, next) => {
   //if there is an image file
   const { id } = req.body;
+
+  const previousImage = req.body.imageUrl;
+
   if (req.file) req.body.imageUrl = req.file.filename;
+
   Product.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: false,
   })
+    .then(() => {
+      if (req.file) {
+        const imagePath = path.join(
+          __dirname,
+          `../public/img/${previousImage}`
+        );
+        return previousImage !== 'product.png'
+          ? deleteFileFromPath(imagePath)
+          : Promise.resolve();
+      } else return Promise.resolve();
+    })
     .then(() => res.redirect('/admin/products'))
     .catch((err) => {
       const error = new Error(err);
@@ -110,8 +125,18 @@ module.exports.getProduct = async (req, res, next) => {
 module.exports.deleteProduct = async (req, res, next) => {
   const { id } = req.query;
   Product.findByIdAndDelete(id)
-    .then(async () => {
+    .then(async (product) => {
+      const imagePath = path.join(
+        __dirname,
+        `../public/img/${product.imageUrl}`
+      );
       await req.user.deleteFromCart(id);
+
+      return product.imageUrl !== 'product.png'
+        ? deleteFileFromPath(imagePath)
+        : Promise.resolve();
+    })
+    .then(() => {
       return res.redirect('/admin/products');
     })
     .catch((err) => {

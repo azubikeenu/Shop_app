@@ -2,7 +2,6 @@ const { cropText } = require('../util/helpers');
 const Product = require('../data/schema/product');
 const Order = require('../data/schema/order');
 const User = require('../data/schema/user');
-const { readFile } = require('fs/promises');
 const path = require('path');
 const fs = require('fs');
 
