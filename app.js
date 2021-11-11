@@ -43,7 +43,7 @@ app.use(express.static(join(getPath, 'public')));
 
 app.use(express.urlencoded({ extended: false, limit: '10kb' }));
 
-// USE session middleware
+// Use session middleware
 app.use(
   session({
     name: 'user-session',
@@ -55,6 +55,7 @@ app.use(
   })
 );
 
+// place this after the session middleware
 app.use(csrfProtection);
 
 app.use(flash());

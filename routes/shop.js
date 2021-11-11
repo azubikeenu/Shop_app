@@ -10,6 +10,7 @@ const {
   postCart,
   deleteCartItem,
   postOrder,
+  getInvoice,
 } = require('../controllers/shop');
 
 router.get('/', getIndexPage);
@@ -26,11 +27,15 @@ router.route('/cart').get(showCart).post(postCart);
 router.post('/cart-delete-item', deleteCartItem);
 
 
+router.get('/orders/:orderId' ,getInvoice)
+
+
 
 router.get('/orders', getOrders);
 
 // // router.get('/checkout', getCheckoutPage);
 
 router.post('/create-order', postOrder);
+
 
 module.exports = router;

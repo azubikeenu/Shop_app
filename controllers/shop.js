@@ -2,7 +2,11 @@ const { cropText } = require('../util/helpers');
 const Product = require('../data/schema/product');
 const Order = require('../data/schema/order');
 const User = require('../data/schema/user');
+const { readFile } = require('fs/promises');
+const path = require('path');
+const fs = require('fs');
 
+const { generatePdf, options } = require('../util/generate_pdf');
 module.exports.getProducts = (req, res, next) => {
   Product.find()
     .then((products) => {
@@ -113,10 +117,9 @@ module.exports.postOrder = async (req, res, next) => {
     email: req.user.email,
     userId: req.session.user._id,
   };
-  console.log(req.session.user);
   Order.create({ products, user })
     .then(async () => {
-      req.session.user.cart.items = [];
+      req.user.cart.items = [];
       await req.user.save();
       res.redirect('/orders');
     })
@@ -130,15 +133,6 @@ module.exports.postOrder = async (req, res, next) => {
 module.exports.getOrders = (req, res, next) => {
   Order.find({ 'user.userId': req.session.user._id })
     .then((orders) => {
-      // const fn = orders.map((order) => {
-      //   return {
-      //     order,
-      //     totalPrice: order.products.reduce((total, curr) => {
-      //       return total + curr.product.price;
-      //     }, 0),
-      //   };
-      // });
-      // console.log(fn);
       return res.status(200).render('shop/orders', {
         title: 'Your Cart',
         path: '/orders',
@@ -150,4 +144,46 @@ module.exports.getOrders = (req, res, next) => {
       error.statusCode = 500;
       return next(error);
     });
+};
+
+const createPdfDoc = (filePath, order) => {
+  const template = '.././views/template.html';
+  const products = order.products.map((p, index) => {
+    return {
+      title: p.product.title,
+      description: p.product.description,
+      quantity: order.products[index].quantity,
+      price: p.product.price,
+      imageUrl:p.product.imageUrl,
+      total: order.products[index].quantity * p.product.price,
+    };
+  });
+  const subtotal = products.reduce((acc, curr) => acc + curr.total, 0);
+
+  const data = {
+    products,
+    subtotal,
+    username: order.user.email,
+    date : new Date().toDateString()
+  };
+  return generatePdf(template, data, options, filePath);
+};
+
+module.exports.getInvoice = (req, res, next) => {
+  const { orderId } = req.params;
+  Order.findById(orderId)
+    .then(async (order) => {
+      if (!order) {
+        return next(new Error('Order not found in the db'));
+      }
+      if (order.user.userId.toString() !== req.user._id.toString()) {
+        return next(new Error('Unauthorized'));
+      }
+      const filename = `invoice-${orderId}.pdf`;
+      const filePath = path.join('docs', filename);
+      await createPdfDoc(filePath, order);
+      const file = fs.createReadStream(filePath);
+      file.pipe(res);
+    })
+    .catch((err) => next(err));
 };

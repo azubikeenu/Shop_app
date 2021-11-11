@@ -15,24 +15,23 @@ module.exports.renderLogin = (req, res, next) => {
 };
 
 module.exports.postLogin = (req, res, next) => {
+  // setting a cookie
   //res.setHeader('Set-Cookie', 'loggedIn=true ;HttpOnly')
+  // getting a cookie
+  // req.get('Cookie').split(';')[1]
   const { email } = req.body;
   User.findOne({ email }).then(async (user) => {
-    if (!user) {
-      setFlashMessage(req, 'error', 'Invalid username or password');
-      return res.redirect('/login');
-    }
-    const correctPassword = await user.comparePasswords(
-      req.body.password,
-      user.password
-    );
-    if (!correctPassword) {
+    if (
+      !user ||
+      !(await user.comparePasswords(req.body.password, user.password))
+    ) {
       setFlashMessage(req, 'error', 'Invalid username or password');
       return res.redirect('/login');
     }
     req.session.user = user;
     req.session.isLoggedIn = true;
     req.session.save((err) => {
+      console.log('saved');
       if (err) {
         const error = new Error(err);
         error.statusCode = 500;

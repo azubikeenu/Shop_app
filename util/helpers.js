@@ -27,12 +27,8 @@ module.exports = {
 
   getFlashMessage(req, type) {
     let message = req.flash(type);
-    if (message.length > 0) {
-      message = message[0];
-    } else {
-      message = undefined;
-    }
-    return message;
+    message =  message.length > 0 ? message[0] : undefined
+    return message ;
   },
 
   setFlashMessage(req, type, message) {

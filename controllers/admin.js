@@ -6,14 +6,15 @@ const multerStorage = multer.memoryStorage();
 
 const Product = require('../data/schema/product');
 
+
+const upload = multer({ storage: multerStorage });
+
 module.exports.getAddProducts = (req, res, next) => {
   res.status(200).render('admin/add-product', {
     title: 'Add Product',
     path: '/admin/add-product',
   });
 };
-
-const upload = multer({ storage: multerStorage });
 
 exports.resizeImage = (req, res, next) => {
   const randomId = crypto.randomBytes(4).toString('hex');
