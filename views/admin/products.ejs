@@ -26,7 +26,8 @@
                         href="/admin/delete-product?id=<%=product._id%>">Delete </a> </div>
             </article> <%}%>
         </div>
-        <%} else{%> <h1>No products found!</h1>
+        <%-include('../partials/pagination.ejs' , {current ,pages}) %>
+            <%} else{%> <h1>No products found!</h1>
             <%}%>
     </main>
     <%-include('../partials/footer.ejs') %>

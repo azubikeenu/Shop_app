@@ -4,6 +4,7 @@ const sharp = require('sharp');
 const path = require('path');
 const { cropText, deleteFileFromPath } = require('../util/helpers');
 const multerStorage = multer.memoryStorage();
+const { renderProducts } = require('../util/render_products');
 
 const Product = require('../data/schema/product');
 
@@ -45,20 +46,15 @@ module.exports.postAddProduct = (req, res, next) => {
 };
 
 module.exports.showProducts = async (req, res, next) => {
-  Product.find()
-    .then((products) => {
-      return res.render('admin/products', {
-        prods: products,
-        title: 'All Products',
-        path: 'admin/products',
-        cropText,
-      });
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      error.statusCode = 500;
-      return next(error);
-    });
+  const { count, products, page, perPage } = await renderProducts(req, next);
+  return res.render('admin/products', {
+    prods: products,
+    title: 'All Products',
+    path: 'admin/products',
+    cropText,
+    current: page,
+    pages: Math.ceil(count / perPage),
+  });
 };
 
 module.exports.showEditPage = async (req, res, next) => {

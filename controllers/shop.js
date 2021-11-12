@@ -4,40 +4,32 @@ const Order = require('../data/schema/order');
 const User = require('../data/schema/user');
 const path = require('path');
 const fs = require('fs');
+const { renderProducts } = require('../util/render_products');
 
 const { generatePdf, options } = require('../util/generate_pdf');
-module.exports.getProducts = (req, res, next) => {
-  Product.find()
-    .then((products) => {
-      return res.render('shop/product-list', {
-        prods: products,
-        title: 'All Products',
-        path: '/products',
-        cropText,
-      });
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      error.statusCode = 500;
-      return next(error);
-    });
+
+module.exports.getProducts = async (req, res, next) => {
+  const { count, products, page, perPage } = await renderProducts(req, next);
+  return res.render('shop/product-list', {
+    prods: products,
+    title: 'All Products',
+    path: '/products',
+    cropText,
+    current: page,
+    pages: Math.ceil(count / perPage),
+  });
 };
 
-module.exports.getIndexPage = (req, res, next) => {
-  Product.find()
-    .then((products) => {
-      return res.render('shop/index', {
-        prods: products,
-        title: 'Shop',
-        path: '/',
-        cropText,
-      });
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      error.statusCode = 500;
-      return next(error);
-    });
+module.exports.getIndexPage = async (req, res, next) => {
+  const { count, products, page, perPage } = await renderProducts(req, next);
+  return res.render('shop/index', {
+    prods: products,
+    title: 'Shop',
+    path: '/',
+    cropText,
+    current: page,
+    pages: Math.ceil(count / perPage),
+  });
 };
 
 module.exports.showCart = async (req, res, next) => {
@@ -102,7 +94,11 @@ module.exports.deleteCartItem = (req, res, next) => {
       console.log('Item deleted from cart');
       res.redirect('/cart');
     })
-    .catch((err) => {});
+    .catch((err) => {
+      const error = new Error(err);
+      error.statusCode = 500;
+      return next(error);
+    });
 };
 
 module.exports.postOrder = async (req, res, next) => {
@@ -153,7 +149,7 @@ const createPdfDoc = (filePath, order) => {
       description: p.product.description,
       quantity: order.products[index].quantity,
       price: p.product.price,
-      imageUrl:p.product.imageUrl,
+      imageUrl: p.product.imageUrl,
       total: order.products[index].quantity * p.product.price,
     };
   });
@@ -163,7 +159,7 @@ const createPdfDoc = (filePath, order) => {
     products,
     subtotal,
     username: order.user.email,
-    date : new Date().toDateString()
+    date: new Date().toDateString(),
   };
   return generatePdf(template, data, options, filePath);
 };

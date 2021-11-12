@@ -83,10 +83,10 @@ app.use(get404);
 
 
 
-app.use((error, req, res, next) => {
-  // res.status(error.httpStatusCode).render(...);
-  return res.redirect('/server_error');
-});
+// app.use((error, req, res, next) => {
+//   // res.status(error.httpStatusCode).render(...);
+//   return res.redirect('/server_error');
+// });
 
 mongoose
   .connect(MONGODB_URI, {
