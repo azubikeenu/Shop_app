@@ -57,6 +57,15 @@ module.exports.showProducts = async (req, res, next) => {
   });
 };
 
+
+const deleteImageFromPath = (imageUrl) => {
+  const imagePath = path.join(__dirname, `../public/img/${imageUrl}`);
+  return imageUrl !== 'product.png'
+    ? deleteFileFromPath(imagePath)
+    : Promise.resolve();
+};
+
+
 module.exports.showEditPage = async (req, res, next) => {
   const { id } = req.query;
   Product.findById(id)
@@ -78,26 +87,17 @@ module.exports.showEditPage = async (req, res, next) => {
 };
 
 module.exports.editProduct = async (req, res, next) => {
-  //if there is an image file
   const { id } = req.body;
-
   const previousImage = req.body.imageUrl;
-
+  //if there is an image file
   if (req.file) req.body.imageUrl = req.file.filename;
-
   Product.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: false,
   })
     .then(() => {
       if (req.file) {
-        const imagePath = path.join(
-          __dirname,
-          `../public/img/${previousImage}`
-        );
-        return previousImage !== 'product.png'
-          ? deleteFileFromPath(imagePath)
-          : Promise.resolve();
+        deleteImageFromPath(previousImage);
       } else return Promise.resolve();
     })
     .then(() => res.redirect('/admin/products'))
@@ -122,15 +122,8 @@ module.exports.deleteProduct = async (req, res, next) => {
   const { id } = req.query;
   Product.findByIdAndDelete(id)
     .then(async (product) => {
-      const imagePath = path.join(
-        __dirname,
-        `../public/img/${product.imageUrl}`
-      );
       await req.user.deleteFromCart(id);
-
-      return product.imageUrl !== 'product.png'
-        ? deleteFileFromPath(imagePath)
-        : Promise.resolve();
+      deleteImageFromPath(product.imageUrl);
     })
     .then(() => {
       return res.redirect('/admin/products');
