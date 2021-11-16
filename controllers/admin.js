@@ -4,6 +4,7 @@ const sharp = require('sharp');
 const path = require('path');
 const { cropText, deleteFileFromPath } = require('../util/helpers');
 const multerStorage = multer.memoryStorage();
+
 const { renderProducts } = require('../util/render_products');
 
 const Product = require('../data/schema/product');
@@ -57,14 +58,12 @@ module.exports.showProducts = async (req, res, next) => {
   });
 };
 
-
 const deleteImageFromPath = (imageUrl) => {
   const imagePath = path.join(__dirname, `../public/img/${imageUrl}`);
   return imageUrl !== 'product.png'
     ? deleteFileFromPath(imagePath)
     : Promise.resolve();
 };
-
 
 module.exports.showEditPage = async (req, res, next) => {
   const { id } = req.query;
@@ -127,6 +126,27 @@ module.exports.deleteProduct = async (req, res, next) => {
     })
     .then(() => {
       return res.redirect('/admin/products');
+    })
+    .catch((err) => {
+      const error = new Error(err);
+      error.statusCode = 500;
+      return next(error);
+    });
+};
+
+
+module.exports.deleteProductAsync = (req, res, next) => {
+  const { id } = req.params;
+  console.log(id);
+  Product.findByIdAndDelete(id)
+    .then(async (product) => {
+      await req.user.deleteFromCart(id);
+      deleteImageFromPath(product.imageUrl);
+    })
+    .then(() => {
+      res.status(200).json({
+        message: 'DELETED',
+      });
     })
     .catch((err) => {
       const error = new Error(err);

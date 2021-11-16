@@ -22,8 +22,9 @@
                     </p>
                 </div>
                 <div class="card__actions">
-                    <a class="btn" href="/admin/edit-product?id=<%=product._id%>">Edit </a> <a class="btn"
-                        href="/admin/delete-product?id=<%=product._id%>">Delete </a> </div>
+
+                    <a class="btn" href="/admin/edit-product?id=<%=product._id%>">Edit </a> <a class="btn delete"
+                        href="#" data-id="<%=product._id%>" data-csrf="<%=csrfToken%>">Delete </a> </div>
             </article> <%}%>
         </div>
         <%-include('../partials/pagination.ejs' , {current ,pages}) %>

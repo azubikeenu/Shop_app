@@ -1,27 +1,25 @@
-// const updateForm = document.getElementById('update_form');
-// const title = document.getElementById('title');
-// const price = document.getElementById('price');
-// const photo = document.getElementById('image');
-// const description = document.getElementById('description');
-// const id = new URLSearchParams(location.search).get('id');
+const article = document.querySelector('.grid');
 
-// if (updateForm) {
-//   updateForm.addEventListener('submit', async (e) => {
-//     e.preventDefault();
-//     const formData = new FormData();
-//     formData.append('title', title.value);
-//     formData.append('price', price.value);
-//     formData.append('description', description.value);
-//     formData.append('photo', photo.files[0]);
-//     const endpoint = ` http://localhost:3000/admin/edit-product/${id}`;
-//     try {
-//       await axios({
-//         method: 'PUT',
-//         url: endpoint,
-//         data: formData,
-//       });
-//     } catch (err) {
-//       console.log(err);
-//     }
-//   });
-// }
+const deleteUrl = '/admin/delete-product/';
+
+if (article) {
+  article.addEventListener('click', (e) => {
+    if (e.target.classList.contains('delete')) {
+      const { id, csrf } = e.target.dataset;
+      fetch(`${deleteUrl}${id}`, {
+        method: 'DELETE',
+        headers: {
+          'csrf-token': csrf,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message === 'DELETED')
+            e.target.parentElement.parentElement.remove();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  });
+}

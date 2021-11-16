@@ -14,6 +14,7 @@ const {
   editProduct,
   getProduct,
   deleteProduct,
+  deleteProductAsync
 } = require('../controllers/admin');
 
 router.use(isLoggedIn);
@@ -54,5 +55,7 @@ router.route('/edit-product').post(
 );
 
 router.get('/delete-product', deleteProduct);
+
+router.delete('/delete-product/:id', deleteProductAsync)
 
 module.exports = router;
