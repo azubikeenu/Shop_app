@@ -3,6 +3,13 @@ const morgan = require('morgan');
 const { join } = require('path');
 const csrf = require('csurf');
 const flash = require('connect-flash');
+//require('dotenv').config({ path: './.env' });
+const helmet = require('helmet');
+const compression = require('compression');
+
+const https = require('https');
+
+const fs = require('fs');
 
 const adminRoute = require('./routes/admin');
 const userRoute = require('./routes/shop');
@@ -11,9 +18,6 @@ const { getPath } = require('./util/helpers');
 const { get404, get500 } = require('./controllers/error');
 const getCurrentUser = require('./middlewares/current_user');
 
-const MONGODB_URI =
-  'mongodb+srv://Richard:azubike88@cluster0.4eqaw.mongodb.net/node-complete?retryWrites=true&w=majority';
-
 const mongoose = require('mongoose');
 
 const session = require('express-session');
@@ -21,7 +25,7 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 const store = MongoDBStore({
-  uri: MONGODB_URI,
+  uri: process.envMONGODB_URI,
   collection: 'sessions',
 });
 
@@ -29,7 +33,15 @@ const store = MongoDBStore({
 
 const app = express();
 
-app.use(morgan('dev'));
+const accessLogStream = fs.createWriteStream(join(__dirname, 'access.log'), {
+  flags: 'a',
+});
+
+const key = fs.readFileSync(join(__dirname, 'server.key'));
+
+const certificate = fs.readFileSync(join(__dirname, 'server.cert'));
+
+app.use(morgan('combined', { stream: accessLogStream }));
 
 const csrfProtection = csrf();
 
@@ -38,6 +50,14 @@ const csrfProtection = csrf();
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
+
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
+
+app.use(compression());
 
 app.use(express.static(join(getPath, 'public')));
 
@@ -68,7 +88,6 @@ app.use((req, res, next) => {
   next();
 });
 
-
 app.use(authRoute);
 
 app.use('/admin', adminRoute);
@@ -80,21 +99,23 @@ app.get('/server_error', get500);
 // this should always appear last
 app.use(get404);
 
-
 app.use((error, req, res, next) => {
   // res.status(error.httpStatusCode).render(...);
   return res.redirect('/server_error');
 });
 
+const PORT = process.env.PORT || 3000;
+
 mongoose
-  .connect(MONGODB_URI, {
+  .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
   .then(() => {
     console.log('Connected to the Database!!!');
-    app.listen(3000, () => {
-      console.log('App listening on port 3000!');
+    // https.createServer({ key, cert: certificate }, app)
+    app.listen(PORT, () => {
+      console.log(`App listening on port ${PORT}`);
     });
   })
   .catch((err) => console.log(err));

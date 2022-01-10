@@ -31,7 +31,6 @@ module.exports.postLogin = (req, res, next) => {
     req.session.user = user;
     req.session.isLoggedIn = true;
     req.session.save((err) => {
-      console.log('saved');
       if (err) {
         const error = new Error(err);
         error.statusCode = 500;

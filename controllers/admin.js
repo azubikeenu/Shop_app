@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const sharp = require('sharp');
 const path = require('path');
 const { cropText, deleteFileFromPath } = require('../util/helpers');
+
 const multerStorage = multer.memoryStorage();
 
 const { renderProducts } = require('../util/render_products');
