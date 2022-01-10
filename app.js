@@ -7,7 +7,7 @@ const flash = require('connect-flash');
 const helmet = require('helmet');
 const compression = require('compression');
 
-const https = require('https');
+// const https = require('https');
 
 const fs = require('fs');
 
@@ -37,9 +37,9 @@ const accessLogStream = fs.createWriteStream(join(__dirname, 'access.log'), {
   flags: 'a',
 });
 
-const key = fs.readFileSync(join(__dirname, 'server.key'));
+// const key = fs.readFileSync(join(__dirname, 'server.key'));
 
-const certificate = fs.readFileSync(join(__dirname, 'server.cert'));
+// const certificate = fs.readFileSync(join(__dirname, 'server.cert'));
 
 app.use(morgan('combined', { stream: accessLogStream }));
 
