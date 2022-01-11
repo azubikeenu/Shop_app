@@ -175,9 +175,13 @@ module.exports.getInvoice = (req, res, next) => {
         return next(new Error('Unauthorized'));
       }
       const filename = `invoice-${orderId}.pdf`;
-      const filePath = path.join('docs', filename);
+      let filePath = path.join('docs', filename);
       await createPdfDoc(filePath, order);
+      filePath =  filePath.replace('\\' , '/')
       const file = fs.createReadStream(filePath);
+      res.setHeader('Content-disposition', 'inline; filename="' + filename + '"');
+      res.setHeader('Content-type', 'application/pdf');
+
       file.pipe(res);
     })
     .catch((err) => next(err));
