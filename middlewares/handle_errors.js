@@ -17,7 +17,7 @@ module.exports = (template, options, func) => {
         getError,
         data,
         ...options,
-        ...renderedData,
+        // ...renderedData,
         oldInput,
       };
 
