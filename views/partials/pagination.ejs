@@ -1,4 +1,5 @@
 <section class="pagination">
+    <% if (count > 1) { %>
     <% if (pages > 0) { %>
     <% if (current == 1) { %>
     <a class="disabled">First</a></li>
@@ -26,4 +27,6 @@
     <% } %>
 
     <% } %>
+    <% } %>
+
 </section>

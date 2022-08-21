@@ -1,6 +1,3 @@
-const multer = require( 'multer' );
-const crypto = require( 'crypto' );
-const sharp = require( 'sharp' );
 const path = require( 'path' );
 const {
   existsSync
@@ -10,7 +7,6 @@ const {
   deleteFileFromPath
 } = require( '../util/helpers' );
 
-const multerStorage = multer.memoryStorage();
 
 const {
   renderProducts
@@ -18,9 +14,6 @@ const {
 
 const Product = require( '../data/schema/product' );
 
-const upload = multer( {
-  storage: multerStorage
-} );
 
 module.exports.getAddProducts = ( req, res, next ) => {
   res.status( 200 ).render( 'admin/add-product', {
@@ -29,23 +22,6 @@ module.exports.getAddProducts = ( req, res, next ) => {
   } );
 };
 
-exports.resizeImage = ( req, res, next ) => {
-  const randomId = crypto.randomBytes( 4 ).toString( 'hex' );
-  if ( !req.file ) {
-    return next();
-  }
-  req.file.filename = `${randomId}-${Date.now()}.png`;
-  sharp( req.file.buffer )
-    .resize( 500, 500 )
-    .toFormat( 'png' )
-    .jpeg( {
-      quality: 90
-    } )
-    .toFile( `public/img/${req.file.filename}` );
-  next();
-};
-
-module.exports.uploadPhoto = upload.single( 'photo' );
 
 module.exports.postAddProduct = ( req, res, next ) => {
   if ( req.file ) req.body.imageUrl = req.file.filename;
@@ -72,6 +48,7 @@ module.exports.showProducts = async ( req, res, next ) => {
     path: 'admin/products',
     cropText,
     current: page,
+    count,
     pages: Math.ceil( count / perPage ),
   } );
 };

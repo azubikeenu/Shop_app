@@ -1,50 +1,56 @@
-const { requireTitle, requirePrice } = require('../util/validator');
+const {
+  requireTitle,
+  requirePrice
+} = require( '../util/validator' );
 
-const router = require('express').Router();
-const handleErrors = require('../middlewares/handle_errors');
-const { isLoggedIn } = require('../middlewares/isloggedin');
+const router = require( 'express' ).Router();
+const handleErrors = require( '../middlewares/handle_errors' );
+const {
+  isLoggedIn
+} = require( '../middlewares/isloggedin' );
+const {
+  resizeImage,
+  uploadPhoto
+} = require( '../middlewares/upload' )
 
 const {
   getAddProducts,
   postAddProduct,
   showProducts,
-  uploadPhoto,
-  resizeImage,
   showEditPage,
   editProduct,
   getProduct,
   deleteProduct,
   deleteProductAsync
-} = require('../controllers/admin');
+} = require( '../controllers/admin' );
 
-router.use(isLoggedIn);
+router.use( isLoggedIn );
 
 router
-  .route('/add-product')
-  .get(getAddProducts)
+  .route( '/add-product' )
+  .get( getAddProducts )
   .post(
     uploadPhoto,
     resizeImage,
-    [requireTitle, requirePrice],
-    handleErrors('admin/add-product', {
+    [ requireTitle, requirePrice ],
+    handleErrors( 'admin/add-product', {
       title: 'Add Product',
       path: '/admin/add-product',
       isAuthenticated: true,
-    }),
+    } ),
     postAddProduct
   );
 
-router.route('/products').get(showProducts);
+router.route( '/products' ).get( showProducts );
 
-router.route('/edit-product').get(showEditPage);
+router.route( '/edit-product' ).get( showEditPage );
 
-router.route('/edit-product').post(
+router.route( '/edit-product' ).post(
   uploadPhoto,
   resizeImage,
-  [requireTitle, requirePrice],
+  [ requireTitle, requirePrice ],
   handleErrors(
-    'admin/edit-product',
-    {
+    'admin/edit-product', {
       title: 'Edit Product',
       path: '/admin/edit-product',
       isAuthenticated: true,
@@ -54,8 +60,8 @@ router.route('/edit-product').post(
   editProduct
 );
 
-router.get('/delete-product', deleteProduct);
+router.get( '/delete-product', deleteProduct );
 
-router.delete('/delete-product/:id', deleteProductAsync)
+router.delete( '/delete-product/:id', deleteProductAsync )
 
 module.exports = router;

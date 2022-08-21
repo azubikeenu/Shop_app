@@ -27,7 +27,7 @@
                         href="#" data-id="<%=product._id%>" data-csrf="<%=csrfToken%>">Delete </a> </div>
             </article> <%}%>
         </div>
-        <%-include('../partials/pagination.ejs' , {current ,pages}) %>
+        <%-include('../partials/pagination.ejs' , {current ,pages , count}) %>
             <%} else{%> <h1>No products found!</h1>
             <%}%>
     </main>
